@@ -1,0 +1,122 @@
+{% extends 'buyer/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+    <div class="cart_list">
+        <div class="cart_top">我的购物车</div>
+        <form action="/buyer/enter_order/" method="post">
+        {% csrf_token %}
+        <div class="cart_listbox">
+            <table width="100%" cellpadding="0" cellspacing="0" border='0px'>
+                <thead>
+                <tr>
+                    <th width='10%'>
+                        <input type="checkbox"  id = "all" style="margin-top: 20px; margin-left: 10px;width: 24px; height: 24px;">
+                    </th>
+                    <th width='10%'>商品名称</th>
+                    <th width='20%'>商品缩略图</th>
+                    <th width='20%'>商品单价</th>
+                    <th width='20%'>商品数量</th>
+                    <th width='20%'>商品小计</th>
+                    <th width='10%'>操作</th>
+                </tr>
+                    </thead>
+
+
+            <tbody id="j_tb">
+                {% if good_list %}
+                    {% for g in good_list %}
+
+                    <tr>
+                        <td>{#clean_fields#}
+                            <input   name="name_{{ g.goods.id}}" value="{{ g.goods.id }}" type="checkbox" style="margin-left: 60px; width: 24px; height: 24px;">
+                        </td>
+                        <td><a href="#">{{ g.goods.goods_name }}</a></td>
+                        <td><a href="#"><img src="{{ g.goods.goods_picture}}" /></a></td>
+                        <td>￥{{ g.goods.goods_price }}元</td>
+                        <td><input type="submit" name="-" value="-" class="btn1" formaction="" />
+                            <input type="text" value="{{ g.goods.goods_num }}" name="count" class="text1"/>
+                            <input type="submit" id="btn1" name="+" value="+" class="btn1" formaction=""/></td>
+                        <td>￥{{ g.all_price }}</td>
+                        <td><a href="/buyer/delete_goods/{{ g.goods.goods_id }}">删除</a></td>
+                    </tr>
+                    {% endfor %}
+
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">购物车空空如也~~，请快去购物吧！</td>
+                </tr>
+                {% endif %}
+            </tbody>
+
+            </table>
+            <div class="goon">
+                <div class="clearcart">
+                    <a href="/buyer/clear_goods"  class="btn">清空购物车</a>
+
+                </div>
+
+
+            </div>
+        <div>
+            <label>配送至:</label>
+            <select name="address" id="" class="input">
+                    {% for i in addr %}
+                        <option value="{{ i.id }}" >{{ i.recver }}--{{ i.phone }}--{{ i.address }} </option>
+                    {% endfor %}
+            </select>
+            <a href="/buyer/address/">管理地址</a>
+        </div>
+
+            <label>支付方式:</label>
+            <select name="pay_Method" id="" class="input">
+                <option value="zfb" class="input">支付宝</option>
+                <option value="wx" class="input">微信</option>
+                <option value="bank" class="input">银行卡</option>
+            </select>
+
+            <div class="totalprice">
+                总计{{ all_price }}元
+            </div>
+        </div>
+
+            <div class="order">
+                <input type="submit" value="立即下单" class="btn" />
+            </div>
+
+    </form>
+    </div>
+    <script>
+        function check(selector) {
+            return document.querySelector(selector)//捕获的是一个数组
+        }
+        var flag=true
+
+        check('#all').onclick=function () {
+
+                var input =check('#j_tb').getElementsByTagName('input')
+                console.log(input)
+                for (var i=0;i<input.length;i++){
+                    input[i].checked=this.checked
+                }
+        }
+        var inputs=check('#j_tb').getElementsByTagName('input')
+        for (var i=0;i<inputs.length;i++){
+            inputs[i].onclick=function () {
+                for(var j=0;j<inputs.length;j++){
+                    if(!inputs[j].checked){
+                        flag=false
+                        check('#all').checked=flag
+                    }
+
+                }
+            }
+        }
+
+
+    </script>
+
+
+{% endblock %}
